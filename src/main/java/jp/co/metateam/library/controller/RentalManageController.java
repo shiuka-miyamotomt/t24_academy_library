@@ -142,9 +142,13 @@ public class RentalManageController {
        }
  
        @PostMapping("/rental/{id}/edit")
-       public String update(@PathVariable("id") Long id,Model model, @Valid @ModelAttribute RentalManageDto rentalManageDto, BindingResult result, RedirectAttributes ra) {
+       public String update(@PathVariable("id") String id,Model model, @Valid @ModelAttribute RentalManageDto rentalManageDto, BindingResult result, RedirectAttributes redirect) {
            try {
-               RentalManage rentalManage = this.rentalManageService.findById(id);
+
+            if (result.hasErrors()) {
+                throw new Exception("Validation error.");
+            }
+               RentalManage rentalManage = this.rentalManageService.findById(Long id);
 
                Optional <String> statusError = rentalManageDto.isvalidStatus(rentalManage.getStatus());
 
@@ -159,29 +163,21 @@ public class RentalManageController {
                 }
 
 
-                if (result.hasErrors()) {
-                    throw new Exception("Validation error.");
-                }
                 //更新
                 rentalManageService.update(id, rentalManageDto);
             
                return "redirect:/rental/index";
            } catch (Exception e) {
 
-            List<Account> accountList = this.accountService.findAll();
-               List<Stock> stockList = this.stockService.findAll();
-
-               model.addAttribute("accounts",accountList);
-               model.addAttribute("stockList",stockList);
-               model.addAttribute("rentalStatus",RentalStatus.values());
+        
 
                log.error(e.getMessage());
    
-               ra.addFlashAttribute("rentalManageDto", rentalManageDto);
-               ra.addFlashAttribute("org.springframework.validation.BindingResult.rentalManageDto", result);
+               redirect.addFlashAttribute("rentalManageDto", rentalManageDto);
+               redirect.addFlashAttribute("org.springframework.validation.BindingResult.rentalManageDto", result);
 
                
-               return "rental/edit";
+               return "redirect:/rental/{id}/edit";
            }
        }
  
