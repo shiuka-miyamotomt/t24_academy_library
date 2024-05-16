@@ -148,7 +148,7 @@ public class RentalManageController {
             if (result.hasErrors()) {
                 throw new Exception("Validation error.");
             }
-               RentalManage rentalManage = this.rentalManageService.findById(Long id);
+               RentalManage rentalManage = this.rentalManageService.findById(Long.valueOf(id));
 
                Optional <String> statusError = rentalManageDto.isvalidStatus(rentalManage.getStatus());
 
@@ -164,7 +164,7 @@ public class RentalManageController {
 
 
                 //更新
-                rentalManageService.update(id, rentalManageDto);
+                rentalManageService.update(Long.valueOf(id), rentalManageDto);
             
                return "redirect:/rental/index";
            } catch (Exception e) {
