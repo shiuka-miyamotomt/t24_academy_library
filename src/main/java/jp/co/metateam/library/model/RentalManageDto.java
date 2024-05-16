@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.FutureOrPresent;
 import jp.co.metateam.library.values.RentalStatus;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,11 +33,15 @@ public class RentalManageDto {
 
     @DateTimeFormat(pattern="yyyy-MM-dd")
     @NotNull(message="貸出予定日は必須です")
+    @FutureOrPresent(message="貸出予定日で現在よりも前の日付は選択できません")
     private Date expectedRentalOn;
+    
 
     @DateTimeFormat(pattern="yyyy-MM-dd")
     @NotNull(message="返却予定日は必須です")
+    @FutureOrPresent(message="返却予定日で現在よりも前の日付は選択できません")
     private Date expectedReturnOn;
+    
 
     private Timestamp rentaledAt;
 
