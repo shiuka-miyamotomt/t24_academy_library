@@ -2,11 +2,14 @@ package jp.co.metateam.library.model;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Optional;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.FutureOrPresent;
+import jp.co.metateam.library.values.RentalStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,11 +33,15 @@ public class RentalManageDto {
 
     @DateTimeFormat(pattern="yyyy-MM-dd")
     @NotNull(message="貸出予定日は必須です")
+    @FutureOrPresent(message="貸出予定日は現在よりも前の日付に選択できません")
     private Date expectedRentalOn;
+    
 
     @DateTimeFormat(pattern="yyyy-MM-dd")
     @NotNull(message="返却予定日は必須です")
+    @FutureOrPresent(message="返却予定日は現在よりも前の日付に選択できません")
     private Date expectedReturnOn;
+    
 
     private Timestamp rentaledAt;
 
@@ -45,4 +52,38 @@ public class RentalManageDto {
     private Stock stock;
 
     private Account account;
+
+    //貸出ステータスのエラーメッセージ
+    public Optional<String> isvalidStatus(Integer preStatus){
+        if(preStatus == RentalStatus.RENT_WAIT.getValue() && this.status == RentalStatus.RETURNED.getValue()){
+            return Optional.of( "貸出ステータスを貸出待ちから返却済みには変更できません");
+        }
+        else if(preStatus == RentalStatus.RENTAlING.getValue() && this.status == RentalStatus.RENT_WAIT.getValue()){
+            return Optional.of( "貸出ステータスを貸出中から貸出待ちには変更できません");
+        }
+        else if(preStatus == RentalStatus.RENTAlING.getValue() && this.status == RentalStatus.CANCELED.getValue()){
+            return Optional.of( "貸出ステータスを貸出中からキャンセルには変更できません");
+        }
+        else if(preStatus == RentalStatus.RETURNED.getValue() && this.status == RentalStatus.RENT_WAIT.getValue()){
+            return Optional.of( "貸出ステータスを返却済みから貸出待ちには変更できません");
+        }
+        else if(preStatus == RentalStatus.RETURNED.getValue() && this.status == RentalStatus.RENTAlING.getValue()){
+            return Optional.of( "貸出ステータスを返却済みから貸出中には変更できません");
+        }
+        else if(preStatus == RentalStatus.RETURNED.getValue() && this.status == RentalStatus.CANCELED.getValue()){
+            return Optional.of( "貸出ステータスを返却済みからキャンセルには変更できません");
+        }
+        else if(preStatus == RentalStatus.CANCELED.getValue() && this.status == RentalStatus.RENT_WAIT.getValue()){
+            return Optional.of( "貸出ステータスをキャンセルから貸出待ちには変更できません");
+        }
+        else if(preStatus == RentalStatus.CANCELED.getValue() && this.status == RentalStatus.RENTAlING.getValue()){
+            return Optional.of( "貸出ステータスをキャンセルから貸出中には変更できません");
+        }
+        else if(preStatus == RentalStatus.CANCELED.getValue() && this.status == RentalStatus.RETURNED.getValue()){
+            return Optional.of( "貸出ステータスをキャンセルから返却済みには変更できません");
+        }
+        else{
+            return Optional.empty();
+        }
+    }
 }
