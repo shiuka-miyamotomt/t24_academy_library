@@ -33,13 +33,13 @@ public class RentalManageDto {
 
     @DateTimeFormat(pattern="yyyy-MM-dd")
     @NotNull(message="貸出予定日は必須です")
-    @FutureOrPresent(message="貸出予定日で現在よりも前の日付は選択できません")
+    @FutureOrPresent(message="貸出予定日は現在よりも前の日付に選択できません")
     private Date expectedRentalOn;
     
 
     @DateTimeFormat(pattern="yyyy-MM-dd")
     @NotNull(message="返却予定日は必須です")
-    @FutureOrPresent(message="返却予定日で現在よりも前の日付は選択できません")
+    @FutureOrPresent(message="返却予定日は現在よりも前の日付に選択できません")
     private Date expectedReturnOn;
     
 

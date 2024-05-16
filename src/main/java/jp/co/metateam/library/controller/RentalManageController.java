@@ -110,7 +110,7 @@ public class RentalManageController {
     }
  
     @GetMapping ("/rental/{id}/edit")
-     public String edit(@PathVariable("id") String id,Model model) {
+    public String edit(@PathVariable("id") String id, Model model) {
         List<Stock> stockList = this.stockService.findStockAvailableAll();
         List<Account> accountList= this.accountService.findAll();
  
@@ -120,67 +120,54 @@ public class RentalManageController {
         model.addAttribute("accounts",accountList);
        
        
-           if (!model.containsAttribute("rentalManageDto")) {
-              RentalManageDto rentalManageDto = new RentalManageDto();
-              RentalManage rentalManage= this.rentalManageService.findById(Long.valueOf(id));
+        if (!model.containsAttribute("rentalManageDto")) {
+            RentalManageDto rentalManageDto = new RentalManageDto();
+            RentalManage rentalManage= this.rentalManageService.findById(Long.valueOf(id));
              
- 
-              model.addAttribute("rentalManageList",rentalManage);
-             
-              rentalManageDto.setId(rentalManage.getId());
-              rentalManageDto.setEmployeeId(rentalManage.getAccount().getEmployeeId());
-              rentalManageDto.setExpectedRentalOn(rentalManage.getExpectedRentalOn());
-              rentalManageDto.setExpectedReturnOn(rentalManage.getExpectedReturnOn());
-              rentalManageDto.setStatus(rentalManage.getStatus());
-              rentalManageDto.setStockId(rentalManage.getStock().getId());
- 
-              model.addAttribute("rentalManageDto", rentalManageDto);
- 
-           }
-   
-           return "rental/edit";
-       }
- 
-       @PostMapping("/rental/{id}/edit")
-       public String update(@PathVariable("id") String id,Model model, @Valid @ModelAttribute RentalManageDto rentalManageDto, BindingResult result, RedirectAttributes redirect) {
-           try {
+            model.addAttribute("rentalManageList",rentalManage);
+            
+            rentalManageDto.setId(rentalManage.getId());
+            rentalManageDto.setEmployeeId(rentalManage.getAccount().getEmployeeId());
+            rentalManageDto.setExpectedRentalOn(rentalManage.getExpectedRentalOn());
+            rentalManageDto.setExpectedReturnOn(rentalManage.getExpectedReturnOn());
+            rentalManageDto.setStatus(rentalManage.getStatus());
+            rentalManageDto.setStockId(rentalManage.getStock().getId());
 
+            model.addAttribute("rentalManageDto", rentalManageDto);
+        }
+   
+        return "rental/edit";
+    }
+ 
+    @PostMapping("/rental/{id}/edit")
+    public String update(@PathVariable("id") String id, Model model, @Valid @ModelAttribute RentalManageDto rentalManageDto, BindingResult result, RedirectAttributes redirect) {
+        try {
             if (result.hasErrors()) {
                 throw new Exception("Validation error.");
             }
-               RentalManage rentalManage = this.rentalManageService.findById(Long.valueOf(id));
 
-               Optional <String> statusError = rentalManageDto.isvalidStatus(rentalManage.getStatus());
+            RentalManage rentalManage = this.rentalManageService.findById(Long.valueOf(id));
+            Optional <String> statusError = rentalManageDto.isvalidStatus(rentalManage.getStatus());
 
-           
-               if(statusError.isPresent()) {
+            if (statusError.isPresent()) {
                 FieldError fieldError = new FieldError("rentalManageDto","status",statusError.get());
-
                 result.addError(fieldError);
 
                 throw new Exception("Validation error.");
+            }
 
-                }
-
-
-                //更新
-                rentalManageService.update(Long.valueOf(id), rentalManageDto);
-            
-               return "redirect:/rental/index";
-           } catch (Exception e) {
-
+            //更新
+            rentalManageService.update(Long.valueOf(id), rentalManageDto);
         
+            return "redirect:/rental/index";
+        } catch (Exception e) {
+            log.error(e.getMessage());
 
-               log.error(e.getMessage());
-   
-               redirect.addFlashAttribute("rentalManageDto", rentalManageDto);
-               redirect.addFlashAttribute("org.springframework.validation.BindingResult.rentalManageDto", result);
+            redirect.addFlashAttribute("rentalManageDto", rentalManageDto);
+            redirect.addFlashAttribute("org.springframework.validation.BindingResult.rentalManageDto", result);
 
-               
-               return "redirect:/rental/{id}/edit";
-           }
-       }
- 
+            return "redirect:/rental/{id}/edit";
+        }
     }
+}
  
-
